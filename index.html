@@ -47,6 +47,20 @@ a{color:#ff2e88;text-decoration:none}a:hover{color:#7c5cff}
 .scrolldown{display:block;text-align:center;margin-top:26px;font-weight:600;color:#7c5cff;animation:bob 1.6s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(9px)}}
 
+/* countdown */
+.cd{margin-top:30px;text-align:center}
+.cd-title{font-size:clamp(24px,5vw,34px);color:#7c5cff;margin-bottom:16px;transform:rotate(-1deg)}
+.cd-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(10px,2.5vw,18px)}
+.cd-cell{flex:0 0 auto;width:clamp(74px,20vw,116px);background:#fff;border-radius:26px;border:5px solid #fff;padding:18px 6px 14px;box-shadow:0 12px 0 rgba(0,0,0,.10),inset 0 5px 0 rgba(255,255,255,.8);animation:pop 3.4s ease-in-out infinite}
+.cd-cell:nth-child(2){animation-delay:.25s}.cd-cell:nth-child(3){animation-delay:.5s}.cd-cell:nth-child(4){animation-delay:.75s}
+.cd-num{display:block;font-size:clamp(38px,9vw,60px);line-height:.9;text-shadow:0 5px 0 rgba(0,0,0,.10)}
+.cd-lab{display:block;margin-top:8px;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#a58fb8}
+.cd-pink{background:linear-gradient(180deg,#fff,#ffe3f1)}.cd-pink .cd-num{color:#ff2e88}
+.cd-yellow{background:linear-gradient(180deg,#fff,#fff3c4)}.cd-yellow .cd-num{color:#ffb800}
+.cd-teal{background:linear-gradient(180deg,#fff,#dbfff6)}.cd-teal .cd-num{color:#18c5b0}
+.cd-purp{background:linear-gradient(180deg,#fff,#eee6ff)}.cd-purp .cd-num{color:#7c5cff}
+.cd-party{font-size:clamp(26px,6vw,40px);color:#18a99a}
+
 /* section title */
 .stitle{font-size:clamp(40px,8vw,74px);text-align:center;margin:0 0 34px}
 .st-a{color:#ff2e88}.st-b{color:#7c5cff}.st-c{color:#18a99a}
@@ -128,6 +142,16 @@ textarea.inp{resize:vertical;min-height:70px}
     <div class="when">
       <div class="disp datebig">19 · 09 · 2026</div>
       <div class="sub">Orto Domingo · Bari · dalle 19:00</div>
+    </div>
+    <div class="cd" id="countdown" aria-label="conto alla rovescia alla festa">
+      <div class="cd-title disp">manca poco!</div>
+      <div class="cd-grid" id="cdGrid">
+        <div class="cd-cell cd-pink"><span class="cd-num disp" id="cd-d">00</span><span class="cd-lab">giorni</span></div>
+        <div class="cd-cell cd-yellow"><span class="cd-num disp" id="cd-h">00</span><span class="cd-lab">ore</span></div>
+        <div class="cd-cell cd-teal"><span class="cd-num disp" id="cd-m">00</span><span class="cd-lab">minuti</span></div>
+        <div class="cd-cell cd-purp"><span class="cd-num disp" id="cd-s">00</span><span class="cd-lab">secondi</span></div>
+      </div>
+      <div class="cd-party disp" id="cdParty" style="display:none">🎉 È oggi! Si festeggia! 🎉</div>
     </div>
     <a href="#rsvp" class="scrolldown">↓ scendi e conferma ↓</a>
   </section>
@@ -254,6 +278,30 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzU8xtB4QguxMwO
       ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.62); ctx.restore(); return true;
     });
     requestAnimationFrame(tick);
+  })();
+})();
+
+/* ---------- Countdown ---------- */
+(function countdown(){
+  // 19 settembre 2026, ore 19:00 (ora legale italiana = +02:00)
+  const target = new Date('2026-09-19T19:00:00+02:00').getTime();
+  const dEl=document.getElementById('cd-d'), hEl=document.getElementById('cd-h'),
+        mEl=document.getElementById('cd-m'), sEl=document.getElementById('cd-s'),
+        grid=document.getElementById('cdGrid'), party=document.getElementById('cdParty');
+  const pad = n => String(n).padStart(2,'0');
+  (function tick(){
+    const diff = target - Date.now();
+    if(diff <= 0){
+      if(grid) grid.style.display='none';
+      if(party) party.style.display='block';
+      return; // festa iniziata: stop
+    }
+    const s = Math.floor(diff/1000);
+    dEl.textContent = Math.floor(s/86400);
+    hEl.textContent = pad(Math.floor(s%86400/3600));
+    mEl.textContent = pad(Math.floor(s%3600/60));
+    sEl.textContent = pad(s%60);
+    setTimeout(tick, 1000);
   })();
 })();
 
